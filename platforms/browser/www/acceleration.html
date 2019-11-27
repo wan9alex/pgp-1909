@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>Hello World</title>
+</head>
+
+<body>
+    <div class="app">
+        <h1>PhoneGap!!</h1>
+        <input type="button" value="获取一次加速度" id="btn1">
+        <input type="button" value="监听加速度" id="btn2">
+        <input type="button" value="停止监听" id="btn3">
+        <!-- <img id="myImage" src="" alt="" width="100"> -->
+        <!-- <video src="" id="v1" controls></video> -->
+        <div id="sudu">-</div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+    
+    <script type="text/javascript">
+
+        document.addEventListener('deviceready', function(){
+
+            var watchID
+
+           var btn1 = document.getElementById('btn1');
+           var btn2 = document.getElementById('btn2');
+           var btn3 = document.getElementById('btn3');
+
+
+           btn1.addEventListener('click',function(e){
+                function onSuccess(acceleration) {
+                    let sudu = document.getElementById('sudu')
+                    sudu.innerHTML = acceleration.x+'/'+acceleration.y+'/'+acceleration.z
+                }
+                    
+                function onError() {
+                    alert('onError!');
+                }
+                    
+                navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+
+           },false)
+
+           btn2.addEventListener('click',function(e){
+            function onSuccess(acceleration) {
+                let sudu = document.getElementById('sudu')
+                sudu.innerHTML = acceleration.x+'/'+acceleration.y+'/'+acceleration.z
+
+                if(
+                    Math.abs(acceleration.x)>15 ||
+                    Math.abs(acceleration.y)>15 ||
+                    Math.abs(acceleration.z)>15 
+                ){
+                    //摇一摇的业务
+                    navigator.notification.beep(1)
+                }
+            }
+                
+            function onError() {
+                alert('onError!');
+            }
+                
+            var options = { frequency: 100 };  // 每隔3秒更新一次
+                
+            watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+               
+           },false)
+
+           btn3.addEventListener('click',function(e){
+            navigator.accelerometer.clearWatch(watchID);
+           },false)
+
+        }, false);
+
+    </script>
+</body>
+
+</html>
